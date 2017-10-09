@@ -10,3 +10,5 @@ dist
 *.sublime-workspace
 *~
 older-version
+package-lock.json
+.idea
