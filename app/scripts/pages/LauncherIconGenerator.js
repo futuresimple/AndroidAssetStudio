@@ -75,6 +75,8 @@ export class LauncherIconGenerator extends BaseGenerator {
           maxFinalSize: { w: 720, h: 720 }, // max render size, for SVGs
           defaultValueTrim: 1,
           defaultValuePadding: .25,
+          defaultValueTop: 0,
+          defaultValueLeft: 0,
           defaultValueClipart: 'android',
           dropTarget: document.body
         }),

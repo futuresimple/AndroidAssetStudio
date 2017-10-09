@@ -230,6 +230,26 @@ export class ImageField extends Field {
               return (v * 100).toFixed(0) + '%';
             }
           })),
+          (this.spaceFormTopField_ = new RangeField('top', {
+            title: 'Top adjustment (0 = vertically aligned)',
+            defaultValue: this.params_.defaultValueTop || 0,
+            min: -0.5,
+            max: 0.5, // 1/2 of min(width, height)
+            step: 0.01,
+            textFn(v) {
+              return (v * 100).toFixed(0) + '%';
+            }
+          })),
+          (this.spaceFormLeftField_ = new RangeField('left', {
+            title: 'Left adjustment (0 = horizontally aligned)',
+            defaultValue: this.params_.defaultValueLeft || 0,
+            min: -0.5,
+            max: 0.5, // 1/2 of min(width, height)
+            step: 0.01,
+            textFn(v) {
+              return (v * 100).toFixed(0) + '%';
+            }
+          })),
         ]
       });
       this.spaceForm_.onChange(() => {
@@ -364,12 +384,18 @@ export class ImageField extends Field {
     if (this.spaceForm_) {
       this.spaceFormTrimField_.setEnabled(true);
       this.spaceFormPaddingField_.setEnabled(true);
+      this.spaceFormTopField_.setEnabled(true);
+      this.spaceFormLeftField_.setEnabled(true);
       if (type == 'clipart') {
         if (this.params_.clipartNoTrimPadding) {
           this.spaceFormTrimField_.setEnabled(false);
           this.spaceFormTrimField_.setValue(false);
           this.spaceFormPaddingField_.setEnabled(false);
           this.spaceFormPaddingField_.setValue(0);
+          this.spaceFormTopField_.setEnabled(false);
+          this.spaceFormTopField_.setValue(0);
+          this.spaceFormLeftField_.setEnabled(false);
+          this.spaceFormLeftField_.setValue(0);
         }
       } else if (type == 'text') {
         this.spaceFormTrimField_.setEnabled(false);
@@ -455,13 +481,17 @@ export class ImageField extends Field {
               .then(trimRect => {
                 let pad = this.spaceFormValues_.pad || 0;
                 let padPx = Math.round(pad * Math.min(trimRect.w, trimRect.h));
+                let left = this.spaceFormValues_.left || 0;
+                let leftPx = Math.round(left * Math.min(trimRect.w, trimRect.h));
+                let top = this.spaceFormValues_.top || 0;
+                let topPx = Math.round(top * Math.min(trimRect.w, trimRect.h));
                 this.valueCtx_ = imagelib.Drawing.context({
                   w: trimRect.w + padPx * 2,
                   h: trimRect.h + padPx * 2
                 });
                 this.valueCtx_.drawImage(ctx.canvas,
                     trimRect.x, trimRect.y, trimRect.w, trimRect.h,
-                    padPx, padPx, trimRect.w, trimRect.h);
+                    padPx + leftPx, padPx + topPx, trimRect.w, trimRect.h);
 
                 if (this.imagePreview_) {
                   this.imagePreview_.attr({
