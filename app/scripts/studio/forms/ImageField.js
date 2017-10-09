@@ -225,7 +225,7 @@ export class ImageField extends Field {
             defaultValue: this.params_.defaultValuePadding || 0,
             min: -0.1,
             max: 0.5, // 1/2 of min(width, height)
-            step: 0.05,
+            step: 0.01,
             textFn(v) {
               return (v * 100).toFixed(0) + '%';
             }
