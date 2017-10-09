@@ -68,7 +68,7 @@ export class Field {
    * @param {HTMLElement} container The destination element to contain the
    * field.
    */
-  createUi(container) {
+  createUi(container, formFieldClass = 'form-field-container') {
     container = $(container);
     this.baseEl_ = $('<div>')
         .addClass('form-field-outer')
@@ -84,7 +84,7 @@ export class Field {
         )
         .append(
           $('<div>')
-            .addClass('form-field-container')
+            .addClass(formFieldClass)
         )
         .appendTo(container);
     return this.baseEl_;

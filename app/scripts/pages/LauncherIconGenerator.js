@@ -65,7 +65,7 @@ export class LauncherIconGenerator extends BaseGenerator {
   }
 
   setupForm() {
-    let backColorField, effectsField;
+    let backColorType, backColorField, backGradientField, backGradientDirection, effectsField;
     this.form = new studio.Form({
       id: 'iconform',
       container: '#inputs-form',
@@ -85,9 +85,38 @@ export class LauncherIconGenerator extends BaseGenerator {
           alpha: true,
           defaultValue: 'rgba(96, 125, 139, 0)'
         }),
+        (backColorType = new studio.EnumField('backgroundType', {
+          title: 'Background type',
+          buttons: true,
+          options: [
+            { id: 'solid', title: 'Solid' },
+            { id: 'gradient', title: 'Gradient' }
+          ],
+          defaultValue: 'solid',
+          onChange: newValue => {
+            backColorField.setEnabled(newValue == 'solid');
+            backGradientField.setEnabled(newValue == 'gradient');
+            backGradientDirection.setEnabled(newValue == 'gradient')
+          }
+        })),
         (backColorField = new studio.ColorField('backColor', {
           title: 'Background color',
           defaultValue: '#448aff'
+        })),
+        (backGradientField = new studio.GradientField('backGradient', {
+          title: 'Background gradient',
+          defaultFrom: '#9cb2e1',
+          defaultTo: '#3c4769'
+        })),
+        (backGradientDirection = new studio.EnumField('backGradientDirection', {
+          title: 'Background gradient direction',
+          options: [
+            { id: 't-t-b', title: 'Top to bottom' },
+            { id: 'l-t-r', title: 'Left to right'},
+            { id: 'ltc-t-rbc', title: 'Left top corner to right bottom corner' },
+            { id: 'lbc-t-rtc', title: 'Left bottom corner to right top corner' },
+          ],
+          defaultValue: 't-t-b'
         })),
         new studio.BooleanField('crop', {
           title: 'Scaling',
@@ -106,7 +135,10 @@ export class LauncherIconGenerator extends BaseGenerator {
           ],
           defaultValue: 'square',
           onChange: newValue => {
-            backColorField.setEnabled(newValue != 'none');
+            backColorType.setEnabled(newValue != 'null');
+            backColorField.setEnabled(newValue != 'none' && backColorType.getValue() == 'solid');
+            backGradientField.setEnabled(newValue != 'none' && backColorType.getValue() == 'gradient');
+            backGradientDirection.setEnabled(newValue != 'none' && backColorType.getValue() == 'gradient');
             let newEffectsOptions = newValue == 'none'
                 ? NO_SHAPE_EFFECT_OPTIONS
                 : DEFAULT_EFFECT_OPTIONS;
@@ -198,10 +230,35 @@ export class LauncherIconGenerator extends BaseGenerator {
       // background layer
       draw: ctx => {
         ctx.scale(mult, mult);
-        values.backColor.setAlpha(1);
-        ctx.fillStyle = values.backColor.toRgbString();
 
         let targetRect = TARGET_RECTS_BY_SHAPE[values.backgroundShape];
+
+        if (values.backgroundType == 'solid') {
+          values.backColor.setAlpha(1);
+          ctx.fillStyle = values.backColor.toRgbString();
+        } else if (values.backgroundType == 'gradient') {
+          values.backGradient.from.setAlpha(1);
+          values.backGradient.to.setAlpha(1);
+
+          let gradientDirection = values.backGradientDirection;
+          let gradient;
+
+          if (gradientDirection == 'ltc-t-rbc') {
+            gradient = ctx.createLinearGradient(0, 0, targetRect.w, targetRect.h);
+          } else if (gradientDirection == 'lbc-t-rtc') {
+            gradient = ctx.createLinearGradient(0, targetRect.h, targetRect.w, 0);
+          } else if (gradientDirection == 'l-t-r') {
+            gradient = ctx.createLinearGradient(0, targetRect.h, targetRect.w, targetRect.h);
+          } else {
+            gradient = ctx.createLinearGradient(0, 0, 0, targetRect.h);
+          }
+
+          gradient.addColorStop(0, values.backGradient.from.toRgbString());
+          gradient.addColorStop(1, values.backGradient.to.toRgbString());
+
+          ctx.fillStyle = gradient;
+        }
+
         switch (values.backgroundShape) {
           case 'square':
           case 'vrect':

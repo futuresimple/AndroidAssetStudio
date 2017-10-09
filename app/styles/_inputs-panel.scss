@@ -76,6 +76,11 @@ $formFieldSpacing: 24px;
   flex-direction: column;
 }
 
+.form-field-container-row {
+  display: flex;
+  flex-direction: row;
+}
+
 @mixin form-field-element {
   align-self: flex-start;
   border-radius: 2px;

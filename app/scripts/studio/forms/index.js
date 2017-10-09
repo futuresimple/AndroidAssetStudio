@@ -16,6 +16,7 @@
 
 import {BooleanField} from './BooleanField';
 import {ColorField} from './ColorField';
+import {GradientField} from "./GradientField";
 import {EnumField} from './EnumField';
 import {Field} from './Field';
 import {Form} from './Form';
@@ -26,6 +27,7 @@ import {TextField} from './TextField';
 export const forms = {
   BooleanField,
   ColorField,
+  GradientField,
   EnumField,
   Field,
   Form,
