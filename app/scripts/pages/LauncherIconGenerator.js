@@ -66,6 +66,7 @@ export class LauncherIconGenerator extends BaseGenerator {
 
   setupForm() {
     let backColorType, backColorField, backGradientField, backGradientDirection, effectsField;
+    let shadowColorField, shadowAlphaField;
     this.form = new studio.Form({
       id: 'iconform',
       container: '#inputs-form',
@@ -154,7 +155,23 @@ export class LauncherIconGenerator extends BaseGenerator {
           title: 'Effect',
           buttons: true,
           options: DEFAULT_EFFECT_OPTIONS,
-          defaultValue: 'none'
+          defaultValue: 'none',
+          onChange: newValue => {
+            shadowColorField.setEnabled(newValue == 'shadow');
+            shadowAlphaField.setEnabled(newValue == 'shadow');
+          }
+        })),
+        (shadowColorField = new studio.ColorField('shadowColor', {
+          title: 'Shadow color',
+          defaultValue: '#000000'
+        })),
+        (shadowAlphaField = new studio.RangeField('shadowAlpha', {
+          title: "Shadow alpha",
+          min: 0,
+          max: 1,
+          step: 0.01,
+          defaultValue: 0.2,
+          showText: true
         })),
         new studio.TextField('name', {
           title: 'Name',
@@ -299,8 +316,12 @@ export class LauncherIconGenerator extends BaseGenerator {
       mask: !!(values.backgroundShape == 'none')
     };
 
-    if (values.backgroundShape != 'none' &&values.effects == 'shadow') {
-      foregroundLayer.effects.push({effect: 'cast-shadow'});
+    let shadowColorValue = values.shadowColor.toRgbString()
+
+    let shadowColor = tinycolor(shadowColorValue).setAlpha(values.shadowAlpha).toRgbString();
+
+    if (values.backgroundShape != 'none' && values.effects == 'shadow') {
+      foregroundLayer.effects.push({effect: 'cast-shadow', color: shadowColor});
     }
 
     if (values.foreColor.getAlpha()) {

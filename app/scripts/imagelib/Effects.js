@@ -48,7 +48,7 @@ export const Effects = {
         case 'cast-shadow':
           tmpCtx.clearRect(0, 0, paddedSize.w, paddedSize.h);
           tmpCtx.drawImage(src.canvas || src, padLeft, padTop);
-          renderCastShadow_(tmpCtx, paddedSize.w, paddedSize.h);
+          renderCastShadow_(tmpCtx, paddedSize.w, paddedSize.h, tinycolor(effect.color));
           dstCtx.drawImage(tmpCtx.canvas, padLeft, padTop, size.w, size.h, 0, 0, size.w, size.h);
           break;
 
@@ -189,7 +189,7 @@ export const Effects = {
 }
 
 
-function renderCastShadow_(ctx, w, h) {
+function renderCastShadow_(ctx, w, h, color) {
   let tmpCtx = Drawing.context({w, h});
   // render the cast shadow
   for (let o = 1; o < Math.max(w, h); o++) {
@@ -199,8 +199,8 @@ function renderCastShadow_(ctx, w, h) {
   tmpCtx.fillStyle = '#000';
   tmpCtx.fillRect(0, 0, w, h);
   let gradient = tmpCtx.createLinearGradient(0, 0, w, h);
-  gradient.addColorStop(0, 'rgba(0, 0, 0, .2)');
-  gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  gradient.addColorStop(0, color.toRgbString());
+  gradient.addColorStop(1, color.setAlpha(0).toRgbString());
   tmpCtx.fillStyle = gradient;
   tmpCtx.fillRect(0, 0, w, h);
   ctx.clearRect(0, 0, w, h);
